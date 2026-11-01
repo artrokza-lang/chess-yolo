@@ -9,6 +9,8 @@
 
 Chess piece detection on board photos. **YOLOv3 is implemented from scratch** (Darknet-53 + three YOLO heads), without pretrained weights and without ready-made Ultralytics / darknet implementations. 12 classes: white and black king, queen, bishop, knight, rook, pawn.
 
+> 📝 **Note.** The project was originally developed on **07.06.2026 in Google Colab** as a single notebook, then adapted for local execution in VS Code / Python 3.12 (see `Installation and Run`). The Colab version remains in `notebooks/colab_yolov3_chess.ipynb`.
+
 ---
 
 ## 📸 Example Result
@@ -329,7 +331,7 @@ chess-piece-yolov3/
 ├── doc/
 │   └── 1.png                    # example result
 ├── notebooks/
-│   └── colab_yolov3_chess.ipynb # Google Colab version
+│   └── colab_yolov3_chess.ipynb # original Colab version (07.06.2026)
 ├── models/                      # created automatically, *.keras checkpoints
 └── chess_yolo.zip               # dataset (not committed, in .gitignore)
 ```
