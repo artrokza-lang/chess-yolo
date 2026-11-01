@@ -1,0 +1,27 @@
+# Virtual environment
+.venv/
+venv/
+
+# Dataset
+chess_yolo.zip
+chess_yolo/
+train/labels_backup/
+
+# Model weights
+models/
+*.keras
+*.h5
+
+# Python
+__pycache__/
+*.py[cod]
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

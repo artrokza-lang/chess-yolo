@@ -1,0 +1,6 @@
+tensorflow>=2.16,<2.20
+tf-keras
+opencv-python
+matplotlib
+numpy
+pillow
