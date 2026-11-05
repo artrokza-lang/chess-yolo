@@ -9,6 +9,10 @@
 
 Chess piece detection on board photos. **YOLOv3 is implemented from scratch** (Darknet-53 + three YOLO heads), without pretrained weights and without ready-made Ultralytics / darknet implementations. 12 classes: white and black king, queen, bishop, knight, rook, pawn.
 
+> 🛠️ **Training failure fixed: NaN loss on epoch 1.**  
+> The first from-scratch run produced `loss: nan` from the very first batch. Root cause: randomly initialised network emitted logits up to ±100,000, and `exp(100,000) = inf` inside `sparse_softmax_cross_entropy_with_logits` → `inf - inf = nan`. Clipping logits helped only partially. The real fix was a bounded **MSE-based loss** (no exponentials, no logarithms) plus a hardened pipeline: gradient clipping, degenerate-box filtering (`bh = 0.0` annotations), direct `wh` prediction via sigmoid, and a broadcasting fix in the inference decoder (`score` shape `(13,13,3,1)` → `(13,13,3)`). Training became finite and reproducible.  
+> Full story → [Why MSE](#why-mse).
+
 > 📝 **Note.** The project was originally developed on **07.06.2026 in Google Colab** as a single notebook, then adapted for local execution in VS Code / Python 3.12 (see `Installation and Run`). The Colab version remains in `notebooks/colab_yolov3_chess.ipynb`.
 
 ---
@@ -317,6 +321,12 @@ obj_loss = tf.square(true_obj - pred_obj)
 ```
 
 The loss stops being `nan`. **But** MSE is a weaker gradient than BCE, so the model learns more slowly and separates close classes worse. It is a compromise for a demo, not for production.
+
+Additional robustness fixes that came out of the same debugging session:
+
+- **Degenerate annotations filtered** — some `.txt` files contained `bh = 0.0` boxes that would produce `-inf` in the earlier log-based YOLO loss. `parse_annotation_safe()` drops them and clips coordinates to `[0, 1]`.
+- **Direct `wh` prediction** — `yolo_boxes_direct()` uses `sigmoid(wh) * anchors` instead of `exp(twh) * anchors`, removing another overflow path.
+- **Inference decoder fix** — the `score` tensor arrived with shape `(13, 13, 3, 1)` instead of `(13, 13, 3)`, which caused a broadcasting error when multiplying by `max_score`. Now handled by an explicit `squeeze` in `detect_image()`.
 
 ---
 
